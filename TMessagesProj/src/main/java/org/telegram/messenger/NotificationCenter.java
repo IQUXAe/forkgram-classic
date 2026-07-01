@@ -279,6 +279,10 @@ public class NotificationCenter {
     public static final int loadedAiComposeTones = totalEvents++;
     public static final int updatedChatbot = totalEvents++;
 
+    public static final int xrayStateChanged = totalEvents++;
+    public static final int xrayNodeRotated = totalEvents++;
+    public static final int inviteCodeValidated = totalEvents++;
+
     //global
     public static final int activeAccountChanged = totalEvents++;
     public static final int pushMessagesUpdated = totalEvents++;

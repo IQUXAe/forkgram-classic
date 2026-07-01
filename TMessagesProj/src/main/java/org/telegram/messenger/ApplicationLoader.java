@@ -172,7 +172,18 @@ public class ApplicationLoader extends Application {
             return;
         }
         applicationInited = true;
+
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
+
+        // Start Xray if device is authorized (after native libs are loaded)
+        if (org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+            org.telegram.messenger.xray.XrayNode cachedNode = org.telegram.messenger.supabase.SupabaseConfigDistributor.getInstance().getFirstNode();
+            if (cachedNode != null) {
+                org.telegram.messenger.xray.XrayManager.getInstance().start(cachedNode);
+            }
+            // Start connection monitoring watchdog
+            org.telegram.messenger.watchdog.ConnectionWatchdog.getInstance().start();
+        }
 
         try {
             LocaleController.getInstance(); //TODO improve
@@ -189,6 +200,17 @@ public class ApplicationLoader extends Application {
                         currentNetworkInfo = connectivityManager.getActiveNetworkInfo();
                     } catch (Throwable ignore) {
 
+                    }
+
+                    try {
+                        boolean isVpn = org.telegram.messenger.xray.XrayManager.isVpnActive(context);
+                        if (isVpn) {
+                            org.telegram.messenger.xray.XrayManager.getInstance().stopForVpn();
+                        } else {
+                            org.telegram.messenger.xray.XrayManager.getInstance().resumeAfterVpn();
+                        }
+                    } catch (Throwable e) {
+                        FileLog.e("ApplicationLoader: Failed to toggle Xray for VPN state", e);
                     }
 
                     boolean isSlow = isConnectionSlow();

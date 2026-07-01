@@ -437,6 +437,7 @@ stage('tde2e', """
     cd tde2e_source && git reset --hard HEAD && cd ..
     export NDK={ndk}
     export NINJA_PATH=`which ninja`
+    export PATH=`pwd`/gperf_install/bin:$PATH
 
     tde2e_dir=`pwd`/tde2e
     source_dir=`pwd`/tde2e_source
@@ -484,9 +485,9 @@ stage('tde2e', """
     cd "$source_dir/example/android"
     if [ -n "$SED_CMDS" ]; then
         sed "$SED_CMDS" ./build-tdlib.sh
-        sed "$SED_CMDS" ./build-tdlib.sh | bash -s -- "${{ANDROID_SDK_ROOT:-${{ANDROID_HOME:-{ndk}/../..}}}}"
+        sed "$SED_CMDS" ./build-tdlib.sh | bash -s -- "${{ANDROID_SDK_ROOT:-${{ANDROID_HOME:-{ndk}/../..}}}}" "$(basename {ndk})"
     else
-        ./build-tdlib.sh "${{ANDROID_SDK_ROOT:-${{ANDROID_HOME:-{ndk}/../..}}}}"
+        ./build-tdlib.sh "${{ANDROID_SDK_ROOT:-${{ANDROID_HOME:-{ndk}/../..}}}}" "$(basename {ndk})"
     fi
 
     for arch in {archesStr}; do

@@ -50,7 +50,7 @@ android {
     compileSdkVersion 35
     buildToolsVersion '35.0.0'
 
-    defaultConfig.applicationId = "org.forkgram.classic"
+    defaultConfig.applicationId = "org.iquxae.forkgram.ru"
 
     sourceSets.main.jniLibs.srcDirs = ['../TMessagesProj/jni/']
 
@@ -68,10 +68,10 @@ android {
     }
 
     def fdroid = Utils['isFdroid']()
-    def appSuffix = fdroid ? "" : ".beta"
+    def appSuffix = ""
     def flavorsConfig = fdroid ? "release" : "debug"
     if (fdroid) {
-        defaultConfig.applicationId = "org.forkgram.classic"
+        defaultConfig.applicationId = "org.iquxae.forkgram.ru"
     }
 
     signingConfigs {
@@ -281,7 +281,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 35
         versionName Utils['getVersionName']()
         ndkVersion "27.2.12479018"
@@ -291,7 +291,7 @@ android {
         externalNativeBuild {
             cmake {
                 version '3.10.2'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21' // , '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23' // , '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
             }
         }
     }
@@ -305,3 +305,5 @@ android {
         checkReleaseBuilds false
     }
 }
+
+

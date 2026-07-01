@@ -38,7 +38,7 @@ public class NotificationsService extends Service {
             }
             String CHANNEL_ID = "push_service_channel";
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,"Push Notifications Service",NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,"Telegram Background Service",NotificationManager.IMPORTANCE_MIN);
             notificationManager.createNotificationChannel(channel);
             Intent explainIntent = new Intent("android.intent.action.VIEW");
             explainIntent.setData(Uri.parse("https://github.com/forkgram/TelegramAndroid"));
@@ -48,8 +48,9 @@ public class NotificationsService extends Service {
                     .setContentIntent(explainPendingIntent)
                     .setShowWhen(false)
                     .setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSmallIcon(LauncherIconController.getNotificationIcon()) // [classic] #54: follow selected app icon
-                    .setContentText("Push service: tap to learn more").build();
+                    .setContentText("Telegram: фоновая служба активна").build();
             startForeground(9999,notification);
             } catch (Throwable ignore) {
                 Log.d("Forkgram Classic", "Failed to set intent");
@@ -69,6 +70,8 @@ public class NotificationsService extends Service {
     }
 
     public void onDestroy() {
+        org.telegram.messenger.xray.XrayManager.getInstance().stop();
+        org.telegram.messenger.watchdog.ConnectionWatchdog.getInstance().stop();
         super.onDestroy();
         SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
         if (preferences.getBoolean("pushService", true)) {

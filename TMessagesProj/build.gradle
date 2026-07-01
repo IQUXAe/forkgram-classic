@@ -15,10 +15,15 @@ configurations {
 
 configurations.all {
     exclude group: 'androidx.recyclerview', module: 'recyclerview'
+    // Exclude plain tink — we use tink-android instead (required by security-crypto)
+    exclude group: 'com.google.crypto.tink', module: 'tink'
+    exclude group: 'com.google.protobuf', module: 'protobuf-javalite'
 }
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+
+    // Tink comes transitively from security-crypto, plain tink excluded above
 
     implementation 'androidx.core:core:1.16.0'
     implementation 'androidx.interpolator:interpolator:1.0.0'
@@ -67,8 +72,18 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
-    implementation 'org.unifiedpush.android:connector:3.1.2'
+    implementation ('org.unifiedpush.android:connector:3.1.2') {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    }
     implementation 'org.osmdroid:osmdroid-android:6.1.20'
+
+
+
+    // Encrypted storage (MasterKey requires 1.1.0-alpha02+)
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+
+    // Xray core (precompiled aar)
+    implementation files('libs/libxray.aar')
 }
 
 def getStringForConfig(String s) {
@@ -109,7 +124,7 @@ android {
     defaultConfig.versionCode = Integer.parseInt(Utils['getVersionCode']())
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 35
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
@@ -140,7 +155,7 @@ android {
         externalNativeBuild {
             cmake {
                 version '3.10.2'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
                 if (project.hasProperty("armeabi-v7a")) {
                     abiFilters 'armeabi-v7a'
                 } else if (project.hasProperty("arm64-v8a")) {

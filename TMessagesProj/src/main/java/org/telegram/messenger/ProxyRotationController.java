@@ -52,7 +52,7 @@ public class ProxyRotationController implements NotificationCenter.NotificationC
     };
 
     public static void init() {
-        INSTANCE.initInternal();
+        // no-op, disabled in favor of ConnectionWatchdog
     }
 
     @SuppressWarnings("ComparatorCombinators")

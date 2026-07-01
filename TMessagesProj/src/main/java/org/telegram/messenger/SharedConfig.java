@@ -1446,147 +1446,31 @@ public class SharedConfig {
     }
 
     public static void loadProxyList() {
-        if (proxyListLoaded) {
-            return;
-        }
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-        String proxyAddress = preferences.getString("proxy_ip", "");
-        String proxyUsername = preferences.getString("proxy_user", "");
-        String proxyPassword = preferences.getString("proxy_pass", "");
-        String proxySecret = preferences.getString("proxy_secret", "");
-        int proxyPort = preferences.getInt("proxy_port", 1080);
-
         proxyListLoaded = true;
         proxyList.clear();
-        currentProxy = null;
-        String list = preferences.getString("proxy_list", null);
-        if (!TextUtils.isEmpty(list)) {
-            byte[] bytes = Base64.decode(list, Base64.DEFAULT);
-            SerializedData data = new SerializedData(bytes);
-            int count = data.readInt32(false);
-            if (count == -1) { // V2 or newer
-                int version = data.readByte(false);
-
-                if (version == PROXY_SCHEMA_V2) {
-                    count = data.readInt32(false);
-
-                    for (int i = 0; i < count; i++) {
-                        ProxyInfo info = new ProxyInfo(
-                                data.readString(false),
-                                data.readInt32(false),
-                                data.readString(false),
-                                data.readString(false),
-                                data.readString(false));
-
-                        info.ping = data.readInt64(false);
-                        info.availableCheckTime = data.readInt64(false);
-
-                        proxyList.add(0, info);
-                        if (currentProxy == null && !TextUtils.isEmpty(proxyAddress)) {
-                            if (proxyAddress.equals(info.address) && proxyPort == info.port && proxyUsername.equals(info.username) && proxyPassword.equals(info.password)) {
-                                currentProxy = info;
-                            }
-                        }
-                    }
-                } else {
-                    FileLog.e("Unknown proxy schema version: " + version);
-                }
-            } else {
-                for (int a = 0; a < count; a++) {
-                    ProxyInfo info = new ProxyInfo(
-                            data.readString(false),
-                            data.readInt32(false),
-                            data.readString(false),
-                            data.readString(false),
-                            data.readString(false));
-                    proxyList.add(0, info);
-                    if (currentProxy == null && !TextUtils.isEmpty(proxyAddress)) {
-                        if (proxyAddress.equals(info.address) && proxyPort == info.port && proxyUsername.equals(info.username) && proxyPassword.equals(info.password)) {
-                            currentProxy = info;
-                        }
-                    }
-                }
-            }
-            data.cleanup();
-        }
-        if (currentProxy == null && !TextUtils.isEmpty(proxyAddress)) {
-            ProxyInfo info = currentProxy = new ProxyInfo(proxyAddress, proxyPort, proxyUsername, proxyPassword, proxySecret);
-            proxyList.add(0, info);
+        int xrayPort = org.telegram.messenger.xray.XrayManager.getInstance().isRunning() ? org.telegram.messenger.xray.XrayManager.getInstance().getLocalPort() : 0;
+        if (xrayPort > 0) {
+            currentProxy = new ProxyInfo("127.0.0.1", xrayPort, "", "", "");
+            proxyList.add(currentProxy);
+        } else {
+            currentProxy = null;
         }
     }
 
     public static void saveProxyList() {
-        List<ProxyInfo> infoToSerialize = new ArrayList<>(proxyList);
-        Collections.sort(infoToSerialize, (o1, o2) -> {
-            long bias1 = SharedConfig.currentProxy == o1 ? -200000 : 0;
-            if (!o1.available) {
-                bias1 += 100000;
-            }
-            long bias2 = SharedConfig.currentProxy == o2 ? -200000 : 0;
-            if (!o2.available) {
-                bias2 += 100000;
-            }
-            return Long.compare(o1.ping + bias1, o2.ping + bias2);
-        });
-        SerializedData serializedData = new SerializedData();
-        serializedData.writeInt32(-1);
-        serializedData.writeByte(PROXY_CURRENT_SCHEMA_VERSION);
-        int count = infoToSerialize.size();
-        serializedData.writeInt32(count);
-        for (int a = count - 1; a >= 0; a--) {
-            ProxyInfo info = infoToSerialize.get(a);
-            serializedData.writeString(info.address != null ? info.address : "");
-            serializedData.writeInt32(info.port);
-            serializedData.writeString(info.username != null ? info.username : "");
-            serializedData.writeString(info.password != null ? info.password : "");
-            serializedData.writeString(info.secret != null ? info.secret : "");
-
-            serializedData.writeInt64(info.ping);
-            serializedData.writeInt64(info.availableCheckTime);
-        }
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-        preferences.edit().putString("proxy_list", Base64.encodeToString(serializedData.toByteArray(), Base64.NO_WRAP)).apply();
-        serializedData.cleanup();
+        // no-op to prevent saving modified proxy list
     }
 
     public static ProxyInfo addProxy(ProxyInfo proxyInfo) {
-        loadProxyList();
-        int count = proxyList.size();
-        for (int a = 0; a < count; a++) {
-            ProxyInfo info = proxyList.get(a);
-            if (proxyInfo.address.equals(info.address) && proxyInfo.port == info.port && proxyInfo.username.equals(info.username) && proxyInfo.password.equals(info.password) && proxyInfo.secret.equals(info.secret)) {
-                return info;
-            }
-        }
-        proxyList.add(0, proxyInfo);
-        saveProxyList();
-        return proxyInfo;
+        return proxyInfo; // no-op, do not allow adding other proxies
     }
 
     public static boolean isProxyEnabled() {
-        return MessagesController.getGlobalMainSettings().getBoolean("proxy_enabled", false) && currentProxy != null;
+        return org.telegram.messenger.xray.XrayManager.getInstance().isRunning() && org.telegram.messenger.xray.XrayManager.getInstance().getLocalPort() > 0;
     }
 
     public static void deleteProxy(ProxyInfo proxyInfo) {
-        if (currentProxy == proxyInfo) {
-            currentProxy = null;
-            SharedPreferences preferences = MessagesController.getGlobalMainSettings();
-            boolean enabled = preferences.getBoolean("proxy_enabled", false);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("proxy_ip", "");
-            editor.putString("proxy_pass", "");
-            editor.putString("proxy_user", "");
-            editor.putString("proxy_secret", "");
-            editor.putInt("proxy_port", 1080);
-            editor.putBoolean("proxy_enabled", false);
-            editor.putBoolean("proxy_enabled_calls", false);
-            editor.apply();
-            if (enabled) {
-                ConnectionsManager.setProxySettings(false, "", 0, "", "", "");
-            }
-        }
-        proxyList.remove(proxyInfo);
-        saveProxyList();
+        // no-op, do not allow deleting the enforced proxy
     }
 
     public static void checkSaveToGalleryFiles() {

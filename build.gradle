@@ -10,8 +10,14 @@ buildscript {
         // This is needed since android-connector:2.2.0 is built with Java 17
         classpath 'com.android.tools:r8:8.2.33'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
     }
 }
 repositories {
     google()
+    mavenCentral()
+}
+configurations.all {
+    // Exclude plain tink — security-crypto uses tink-android, both can't coexist
+    exclude group: 'com.google.crypto.tink', module: 'tink'
 }

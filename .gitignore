@@ -23,3 +23,5 @@ TMessagesProj/jni/ffmpeg/build/
 TMessagesProj/jni/boringssl/build/
 TMessagesProj/jni/tde2e/x86*
 TMessagesProj/jni/tde2e/arm*
+TMessagesProj/src/main/java/org/telegram/messenger/supabase/SupabaseSecrets.java
+

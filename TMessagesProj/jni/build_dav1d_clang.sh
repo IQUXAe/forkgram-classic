@@ -159,7 +159,7 @@ function build {
 				build_one
 			;;
 			arm)
-				ANDROID_API=16
+				ANDROID_API=23
 
 				ARCH=arm
 				ARCH_NAME=arm
@@ -179,7 +179,7 @@ function build {
 				build_one
 			;;
 			x86)
-				ANDROID_API=16
+				ANDROID_API=23
 
 				ARCH=x86
 				ARCH_NAME=i686

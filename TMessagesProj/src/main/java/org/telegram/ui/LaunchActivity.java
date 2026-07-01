@@ -1105,6 +1105,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     args.putBoolean("destroyAfterSelect", true);
                     presentFragment(new ContactsActivity(args));
                     drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 20) {
+                    presentFragment(new org.telegram.ui.BypassStatusActivity());
+                    drawerLayoutContainer.closeDrawer(false);
                 }
             }
         });
@@ -1318,6 +1321,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     private BaseFragment getClientNotActivatedFragment() {
+        if (!org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+            return new org.telegram.ui.InviteCodeActivity();
+        }
         if (LoginActivity.loadCurrentState(false, currentAccount).getInt("currentViewNum", 0) != 0) {
             return new LoginActivity();
         }

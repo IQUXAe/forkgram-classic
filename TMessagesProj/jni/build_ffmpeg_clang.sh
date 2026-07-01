@@ -17,7 +17,8 @@ function build_one {
 
 	CC=${CC_PREFIX}clang
 	CXX=${CC_PREFIX}clang++
-	CROSS_PREFIX=${PREBUILT}/bin/${ARCH_NAME}-linux-${BIN_MIDDLE}-
+	CROSS_PREFIX=${LLVM_BIN}/${ARCH_NAME}-linux-${BIN_MIDDLE}-
+	export RANLIB=${CROSS_PREFIX}ranlib
 	
 	INCLUDES=" -I${LIBVPXPREFIX}/include"
 	LIBS=" -L${LIBVPXPREFIX}/lib"
@@ -195,7 +196,7 @@ function build {
 				build_one
 			;;
 			arm)
-				ANDROID_API=16
+				ANDROID_API=23
 
 				ARCH=arm
 				ARCH_NAME=arm
@@ -211,7 +212,7 @@ function build {
 				build_one
 			;;
 			x86)
-				ANDROID_API=16
+				ANDROID_API=23
 
 				ARCH=x86
 				ARCH_NAME=i686

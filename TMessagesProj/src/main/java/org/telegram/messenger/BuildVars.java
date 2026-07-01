@@ -49,10 +49,9 @@ public class BuildVars {
     public static boolean USE_LEGACY_SYSTEM_INSETS = false;
 
     static {
+        LOGS_ENABLED = true;
         if (ApplicationLoader.applicationContext != null) {
             SharedPreferences sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("systemConfig", Context.MODE_PRIVATE);
-            LOGS_ENABLED = DEBUG_VERSION || sharedPreferences.getBoolean("logsEnabled", DEBUG_VERSION);
-            LOGS_ENABLED = sharedPreferences.getBoolean("logsEnabled", false);
             if (LOGS_ENABLED) {
                 final Thread.UncaughtExceptionHandler pastHandler = Thread.getDefaultUncaughtExceptionHandler();
                 Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {

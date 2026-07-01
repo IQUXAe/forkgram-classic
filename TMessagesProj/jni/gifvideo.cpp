@@ -45,7 +45,7 @@ jmethodID jclass_AnimatedFileDrawableStream_isCanceled;
 jmethodID jclass_AnimatedFileDrawableStream_isFinishedLoadingFile;
 jmethodID jclass_AnimatedFileDrawableStream_getFinishedFilePath;
 
-typedef struct VideoInfo {
+struct VideoInfo {
 
     ~VideoInfo() {
         if (video_dec_ctx) {

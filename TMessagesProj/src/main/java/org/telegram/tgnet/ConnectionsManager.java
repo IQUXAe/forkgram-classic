@@ -610,8 +610,11 @@ public class ConnectionsManager extends BaseController {
         String proxySecret = preferences.getString("proxy_secret", "");
         int proxyPort = preferences.getInt("proxy_port", 1080);
 
-        if (preferences.getBoolean("proxy_enabled", false) && !TextUtils.isEmpty(proxyAddress)) {
-            native_setProxySettings(currentAccount, proxyAddress, proxyPort, proxyUsername, proxyPassword, proxySecret);
+        int currentXrayPort = org.telegram.messenger.xray.XrayManager.getInstance().isRunning() ? org.telegram.messenger.xray.XrayManager.getInstance().getLocalPort() : 0;
+        if (currentXrayPort > 0) {
+            native_setProxySettings(currentAccount, "127.0.0.1", currentXrayPort, "", "", "");
+        } else {
+            native_setProxySettings(currentAccount, "", 1080, "", "", "");
         }
         String installer = "";
         try {
@@ -935,17 +938,38 @@ public class ConnectionsManager extends BaseController {
         KeepAliveJob.startJob();
     }
 
+    public static void onXrayPortChanged(int port) {
+        AndroidUtilities.runOnUIThread(() -> {
+            for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                if (a != 0 && !UserConfig.getInstance(a).isClientActivated()) {
+                    continue;
+                }
+                if (port > 0) {
+                    native_setProxySettings(a, "127.0.0.1", port, "", "", "");
+                } else {
+                    native_setProxySettings(a, "", 1080, "", "", "");
+                }
+                // Force reconnect so existing sockets are closed and reopened with new proxy settings
+                getInstance(a).checkConnection();
+            }
+        });
+    }
+
     public static void setProxySettings(boolean enabled, String address, int port, String username, String password, String secret) {
-        if (address == null) {
-            address = "";
-        }
-        if (username == null) {
+        int currentXrayPort = org.telegram.messenger.xray.XrayManager.getInstance().isRunning() ? org.telegram.messenger.xray.XrayManager.getInstance().getLocalPort() : 0;
+        if (currentXrayPort > 0) {
+            address = "127.0.0.1";
+            port = currentXrayPort;
             username = "";
-        }
-        if (password == null) {
             password = "";
-        }
-        if (secret == null) {
+            secret = "";
+            enabled = true;
+        } else {
+            enabled = false;
+            address = "";
+            port = 1080;
+            username = "";
+            password = "";
             secret = "";
         }
 

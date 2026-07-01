@@ -501,6 +501,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ActionBarMenuItem optionsItem;
     private ActionBarMenuItem speedItem;
     public static boolean switchingTheme;
+    private org.telegram.ui.Components.XrayStatusView xrayStatusView;
     private ActionBarMenuItem doneItem;
     private ProxyDrawable proxyDrawable;
     private ActionBarMenuSubItem proxyMenuSubItem;
@@ -3317,6 +3318,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             downloadsItem.setContentDescription(getString(R.string.DownloadsTabs));
             downloadsItem.setVisibility(View.GONE);
 
+            // Add XrayStatusView to ActionBar
+            xrayStatusView = new org.telegram.ui.Components.XrayStatusView(context);
+            actionBar.addView(xrayStatusView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 48, 0));
+
             updateProxyButton(false, false);
         }
 
@@ -3363,6 +3368,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 searching = true;
                 if (switchItem != null) {
                     switchItem.setVisibility(View.GONE);
+                }
+                if (xrayStatusView != null) {
+                    xrayStatusView.setVisibility(View.GONE);
                 }
                 createSearchViewPager();
                 if (viewPages[0] != null) {
@@ -3428,6 +3436,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (viewPages[0] != null) {
                     viewPages[0].listView.setEmptyView(folderId == 0 ? viewPages[0].progressView : null);
                     showSearch(false, false, true);
+                }
+                if (xrayStatusView != null) {
+                    xrayStatusView.setVisibility(View.VISIBLE);
                 }
                 updateProxyButton(false, false);
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.needCheckSystemBarColors, true);
