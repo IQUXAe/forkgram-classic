@@ -60,7 +60,7 @@ public class SupabaseClient {
                 if (code >= 200 && code < 300) {
                     callback.onResponse(response, code, null);
                 } else {
-                    callback.onResponse(response, code, new Exception("HTTP error code: " + code));
+                    callback.onResponse(response, code, new Exception("HTTP error code: " + code + ", body: " + response));
                 }
             } catch (Throwable t) {
                 FileLog.e("SupabaseClient: POST error", t);
@@ -96,7 +96,7 @@ public class SupabaseClient {
                 if (code >= 200 && code < 300) {
                     callback.onResponse(response, code, null);
                 } else {
-                    callback.onResponse(response, code, new Exception("HTTP error code: " + code));
+                    callback.onResponse(response, code, new Exception("HTTP error code: " + code + ", body: " + response));
                 }
             } catch (Throwable t) {
                 FileLog.e("SupabaseClient: GET error", t);
