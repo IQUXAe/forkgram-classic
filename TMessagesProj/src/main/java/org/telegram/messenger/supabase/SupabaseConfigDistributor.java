@@ -73,7 +73,8 @@ public class SupabaseConfigDistributor {
         }
 
         String deviceUid = SupabaseAuthManager.getInstance().getDeviceUid();
-        String jsonBody = "{\"p_device_uid\":\"" + deviceUid + "\"}";
+        String inviteCode = SupabaseAuthManager.getInstance().getSavedInviteCode();
+        String jsonBody = "{\"p_device_uid\":\"" + deviceUid + "\", \"p_code\":\"" + inviteCode + "\"}";
         SupabaseClient.post("/rest/v1/rpc/get_xray_configs", jsonBody, (result, responseCode, error) -> {
             if (error != null) {
                 FileLog.e("SupabaseConfigDistributor: Failed to fetch xray configs from Supabase", error);

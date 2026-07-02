@@ -121,7 +121,7 @@ public class InviteCodeActivity extends BaseFragment {
         progressView.setVisibility(View.INVISIBLE);
         container.addView(progressView, LayoutHelper.createLinear(-2, -2, Gravity.CENTER, 0, 0, 0, 0));
 
-        scrollView.addView(container);
+        scrollView.addView(container, new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         return scrollView;
     }
 

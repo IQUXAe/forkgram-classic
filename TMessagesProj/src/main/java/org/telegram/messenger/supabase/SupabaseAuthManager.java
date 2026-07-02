@@ -82,6 +82,7 @@ public class SupabaseAuthManager {
                 boolean isValid = Boolean.parseBoolean(result);
                 if (isValid) {
                     setLocallyAuthorized(true);
+                    setSavedInviteCode(code);
                 }
                 callback.onResult(isValid);
             } catch (Exception e) {
@@ -129,6 +130,19 @@ public class SupabaseAuthManager {
         if (securePrefs != null) {
             securePrefs.edit().putBoolean("is_authorized", authorized).apply();
         }
+    }
+
+    public void setSavedInviteCode(String code) {
+        if (securePrefs != null) {
+            securePrefs.edit().putString("saved_invite_code", code).apply();
+        }
+    }
+
+    public String getSavedInviteCode() {
+        if (securePrefs != null) {
+            return securePrefs.getString("saved_invite_code", "");
+        }
+        return "";
     }
 
     public String getDeviceUid() {
