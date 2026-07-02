@@ -20,7 +20,7 @@
     <string name="formatterDay12HSec">h:mm:ss a</string>
     <string name="CopyWithoutProtocol">Копировать без протокола</string>
     <!--fork settings view-->
-    <string name="ForkSettingsTitle">Настройки Forkgram Classic</string>
+    <string name="ForkSettingsTitle">Настройки Telegram</string>
     <string name="ForkCheckUpdate">Проверить обновления</string>
     <string name="SquareAvatars">Квадратные аватары</string>
     <string name="SquareAvatarsInfo">Требуется перезапуск</string>
@@ -330,4 +330,7 @@
     <string name="RemindTodayAt">\'Отправить сегодня в\' HH:mm</string>
     <string name="RemindDayAt">\'Отправить\' d MMM \'в\' HH:mm</string>
     <string name="RemindDayYearAt">\'Напомнить\' d MMM yyyy \'в\' HH:mm</string>
+    <string name="ForkBypassDebugInfo">Отладочная информация</string>
+    <string name="ForkBackgroundServiceTitle">Фоновая служба Telegram</string>
+    <string name="ForkBackgroundServiceActive">Telegram: фоновая служба активна</string>
 </resources>

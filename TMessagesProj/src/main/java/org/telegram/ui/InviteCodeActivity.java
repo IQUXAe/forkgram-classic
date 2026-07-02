@@ -51,7 +51,8 @@ public class InviteCodeActivity extends BaseFragment {
         actionBar.setBackButtonImage(0);
         actionBar.setTitle("");
         actionBar.setCastShadows(false);
-        actionBar.setBackgroundColor(0);
+        actionBar.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        actionBar.setAddToContainer(false);
 
         ScrollView scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
@@ -185,5 +186,10 @@ public class InviteCodeActivity extends BaseFragment {
             codeField.requestFocus();
             AndroidUtilities.showKeyboard(codeField);
         }
+    }
+
+    @Override
+    public boolean hasForceLightStatusBar() {
+        return true;
     }
 }

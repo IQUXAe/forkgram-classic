@@ -36,10 +36,12 @@ public class NotificationsService extends Service {
             } else {
                 pendingIntentFlags = PendingIntent.FLAG_MUTABLE;
             }
-            String CHANNEL_ID = "push_service_channel";
+            String CHANNEL_ID = "push_service_channel_v2";
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,"Telegram Background Service",NotificationManager.IMPORTANCE_MIN);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, LocaleController.getString("ForkBackgroundServiceTitle", R.string.ForkBackgroundServiceTitle), NotificationManager.IMPORTANCE_MIN);
             notificationManager.createNotificationChannel(channel);
+            // Delete the old channel so the user doesn't see duplicates in Android settings
+            notificationManager.deleteNotificationChannel("push_service_channel");
             Intent explainIntent = new Intent("android.intent.action.VIEW");
             explainIntent.setData(Uri.parse("https://github.com/forkgram/TelegramAndroid"));
             try {
@@ -50,10 +52,17 @@ public class NotificationsService extends Service {
                     .setOngoing(true)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSmallIcon(LauncherIconController.getNotificationIcon()) // [classic] #54: follow selected app icon
-                    .setContentText("Telegram: фоновая служба активна").build();
-            startForeground(9999,notification);
-            } catch (Throwable ignore) {
-                Log.d("Forkgram Classic", "Failed to set intent");
+                    .setContentText(LocaleController.getString("ForkBackgroundServiceActive", R.string.ForkBackgroundServiceActive)).build();
+            if (Build.VERSION.SDK_INT >= 34) {
+                // FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                startForeground(9999, notification, 1073741824);
+            } else if (Build.VERSION.SDK_INT >= 29) {
+                startForeground(9999, notification, 0); // 0 = none
+            } else {
+                startForeground(9999, notification);
+            }
+            } catch (Throwable e) {
+                Log.e("Forkgram Classic", "Failed to start foreground service", e);
             }
         }
         ApplicationLoader.postInitApplication();
@@ -61,8 +70,26 @@ public class NotificationsService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // postInitApplication() защищена флагом applicationInited и не запустит Xray/Watchdog повторно.
+        // Поэтому явно перезапускаем их здесь — на случай если сервис был убит Android и поднялся снова.
+        if (org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+            org.telegram.messenger.xray.XrayManager xrayManager = org.telegram.messenger.xray.XrayManager.getInstance();
+            if (!xrayManager.isRunning()) {
+                org.telegram.messenger.xray.XrayNode cachedNode = org.telegram.messenger.supabase.SupabaseConfigDistributor.getInstance().getFirstNode();
+                if (cachedNode != null) {
+                    FileLog.d("NotificationsService: Restarting Xray after service restart");
+                    xrayManager.start(cachedNode);
+                }
+            }
+            org.telegram.messenger.watchdog.ConnectionWatchdog watchdog = org.telegram.messenger.watchdog.ConnectionWatchdog.getInstance();
+            if (!watchdog.isRunning()) {
+                FileLog.d("NotificationsService: Restarting ConnectionWatchdog after service restart");
+                watchdog.start();
+            }
+        }
         return START_STICKY;
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {

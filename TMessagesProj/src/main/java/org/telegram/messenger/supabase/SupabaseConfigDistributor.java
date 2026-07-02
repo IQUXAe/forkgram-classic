@@ -66,6 +66,12 @@ public class SupabaseConfigDistributor {
     }
 
     public void fetchConfigs(OnResultListener<List<XrayNode>> callback) {
+        if (!verifyAppSignature(org.telegram.messenger.ApplicationLoader.applicationContext)) {
+            FileLog.e("SupabaseConfigDistributor: ANTI-TAMPER TRIGGERED! APK Signature does not match expected. Refusing to fetch configs.");
+            callback.onResult(getCachedConfigs());
+            return;
+        }
+
         String deviceUid = SupabaseAuthManager.getInstance().getDeviceUid();
         String jsonBody = "{\"p_device_uid\":\"" + deviceUid + "\"}";
         SupabaseClient.post("/rest/v1/rpc/get_xray_configs", jsonBody, (result, responseCode, error) -> {
@@ -119,7 +125,7 @@ public class SupabaseConfigDistributor {
             if (encryptedText == null || encryptedText.isEmpty()) {
                 return "";
             }
-            if (encryptedText.startsWith("vless://")) {
+            if (encryptedText.startsWith("vless://") || encryptedText.startsWith("trojan://") || encryptedText.startsWith("{")) {
                 return encryptedText;
             }
             
@@ -248,5 +254,41 @@ public class SupabaseConfigDistributor {
         }
 
         return list.get(index + 1);
+    }
+
+    private boolean verifyAppSignature(Context context) {
+        try {
+            android.content.pm.Signature[] sigs;
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                android.content.pm.PackageInfo packageInfo = context.getPackageManager().getPackageInfo(
+                        context.getPackageName(), android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES);
+                sigs = packageInfo.signingInfo.getApkContentsSigners();
+            } else {
+                android.content.pm.PackageInfo packageInfo = context.getPackageManager().getPackageInfo(
+                        context.getPackageName(), android.content.pm.PackageManager.GET_SIGNATURES);
+                sigs = packageInfo.signatures;
+            }
+
+            for (android.content.pm.Signature sig : sigs) {
+                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+                md.update(sig.toByteArray());
+                String currentSignature = android.util.Base64.encodeToString(md.digest(), android.util.Base64.NO_WRAP);
+
+                // DEBUG Keystore signature base64 hash: "nik88HLK1/gJ9na26cx1n+rwWi6d8O2ee89SAXAJY44="
+                // RELEASE Keystore signature base64 hash: "kYcX5xr3pI8eUeMEx56UWU0p35h1hcUMeBY3DFB99Hw="
+                if ("kYcX5xr3pI8eUeMEx56UWU0p35h1hcUMeBY3DFB99Hw=".equals(currentSignature)) {
+                    return true;
+                }
+                if (org.telegram.messenger.BuildConfig.DEBUG && "nik88HLK1/gJ9na26cx1n+rwWi6d8O2ee89SAXAJY44=".equals(currentSignature)) {
+                    return true;
+                }
+                
+                // Print the current signature hash so you can copy it for your release build
+                FileLog.e("SupabaseConfigDistributor: UNKNOWN APP SIGNATURE HASH: " + currentSignature);
+            }
+        } catch (Exception e) {
+            FileLog.e("SupabaseConfigDistributor: Failed to verify app signature", e);
+        }
+        return false;
     }
 }

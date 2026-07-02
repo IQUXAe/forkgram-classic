@@ -645,6 +645,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int devicesSectionRow;
     private int forkHeaderRow;
     private int forkRow;
+    private int forkCheckUpdateRow;
+    private int forkDebugRow;
     private int forkSectionCell;
     private int helpHeaderRow;
     private int questionRow;
@@ -4419,6 +4421,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 presentFragment(new SessionsActivity(0));
             } else if (position == forkRow) {
                 presentFragment(new ForkSettingsActivity());
+            } else if (position == forkDebugRow) {
+                presentFragment(new BypassStatusActivity());
             } else if (position == questionRow) {
                 showDialog(AlertsCreator.createSupportAlert(ProfileActivity.this, resourcesProvider));
             } else if (position == faqRow) {
@@ -10726,6 +10730,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 devicesSectionRow = rowCount++;
                 forkHeaderRow = rowCount++;
                 forkRow = rowCount++;
+                forkDebugRow = rowCount++;
                 forkSectionCell = rowCount++;
                 if (!getMessagesController().premiumFeaturesBlocked()) {
                     premiumRow = rowCount++;
@@ -13902,6 +13907,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         textCell.setTextAndIcon(LocaleController.getString(R.string.Devices), R.drawable.msg2_devices, true);
                     } else if (position == forkRow) {
                         textCell.setTextAndIcon(LocaleController.getString(R.string.ForkSettingsTitle), R.drawable.menu_fork, true);
+                    } else if (position == forkCheckUpdateRow) {
+                        // removed
+                    } else if (position == forkDebugRow) {
+                        textCell.setTextAndIcon(LocaleController.getString("ForkBypassDebugInfo", R.string.ForkBypassDebugInfo), R.drawable.msg_log, false);
                     } else if (position == setAvatarRow) {
                         cellCameraDrawable.setCustomEndFrame(86);
                         cellCameraDrawable.setCurrentFrame(85, false);
@@ -14319,6 +14328,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (notificationRow != -1) {
                 int position = holder.getAdapterPosition();
                 return position == notificationRow || position == numberRow || position == privacyRow || position == forkRow ||
+                        position == forkDebugRow ||
                         position == languageRow || position == setUsernameRow || position == bioRow ||
                         position == versionRow || position == dataRow || position == chatRow ||
                         position == questionRow || position == devicesRow || position == filtersRow || position == stickersRow ||
@@ -14366,7 +14376,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     position == subscribersRow || position == subscribersRequestsRow || position == administratorsRow || position == settingsRow || position == blockedUsersRow ||
                     position == addMemberRow || position == joinRow || position == unblockRow ||
                     position == sendMessageRow || position == notificationRow || position == privacyRow ||
-                    position == languageRow || position == forkRow || position == dataRow || position == chatRow ||
+                    position == languageRow || position == forkRow || position == forkDebugRow || position == dataRow || position == chatRow ||
                     position == questionRow || position == devicesRow || position == filtersRow || position == stickersRow ||
                     position == faqRow || position == policyRow || position == sendLogsRow || position == sendLastLogsRow ||
                     position == clearLogsRow || position == switchBackendRow || position == setAvatarRow || position == addToGroupButtonRow ||

@@ -1105,9 +1105,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     args.putBoolean("destroyAfterSelect", true);
                     presentFragment(new ContactsActivity(args));
                     drawerLayoutContainer.closeDrawer(false);
-                } else if (id == 20) {
-                    presentFragment(new org.telegram.ui.BypassStatusActivity());
-                    drawerLayoutContainer.closeDrawer(false);
                 }
             }
         });

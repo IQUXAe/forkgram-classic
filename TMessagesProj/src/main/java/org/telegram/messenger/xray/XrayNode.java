@@ -20,7 +20,8 @@ public class XrayNode {
     public String path;
     public String remark; // fragment (name of node)
     public String serviceName; // serviceName parameter
-    public String xhttpMode; // xhttpMode parameter
+    public String xhttpMode; // xhttp mode
+    public String rawJson; // full raw JSON config parameter
     public boolean allowInsecure;
     public int priority;
 

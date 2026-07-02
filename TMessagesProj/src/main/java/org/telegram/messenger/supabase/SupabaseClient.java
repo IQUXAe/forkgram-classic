@@ -44,6 +44,10 @@ public class SupabaseClient {
                 conn.setRequestProperty("apikey", getSupabaseAnonKey());
                 conn.setRequestProperty("Authorization", "Bearer " + getSupabaseAnonKey());
 
+                if (conn instanceof javax.net.ssl.HttpsURLConnection) {
+                    ((javax.net.ssl.HttpsURLConnection) conn).setSSLSocketFactory(getSSLSocketFactory());
+                }
+                
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
@@ -81,6 +85,10 @@ public class SupabaseClient {
                 conn.setRequestProperty("apikey", getSupabaseAnonKey());
                 conn.setRequestProperty("Authorization", "Bearer " + getSupabaseAnonKey());
 
+                if (conn instanceof javax.net.ssl.HttpsURLConnection) {
+                    ((javax.net.ssl.HttpsURLConnection) conn).setSSLSocketFactory(getSSLSocketFactory());
+                }
+
                 int code = conn.getResponseCode();
                 InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
                 String response = readStream(is);
@@ -112,4 +120,82 @@ public class SupabaseClient {
             return response.toString();
         }
     }
+
+    private static javax.net.ssl.SSLSocketFactory sslSocketFactory;
+    
+    // Pinned SHA-256 hashes for the Supabase (Cloudflare / Google / Let's Encrypt / Sectigo CAs)
+    private static final java.util.List<String> ACCEPTED_PINS = java.util.Arrays.asList(
+        "mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=", // GTS Root R4
+        "kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=", // WE1 (GTS Intermediate)
+        "hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=", // GTS Root R1
+        "Vfd95BwDeSQo+NUZXDzF7HO4glNvNeHrMjm5xAuhVwc=", // GTS Root R2
+        "QX7oKcgMuvHNgRXyqr3AWZJhbJj/FboqL/qQ3b8FqG4=", // GTS Root R3
+        "C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=", // ISRG Root X1 (Let's Encrypt)
+        "diO7ZzO+Gu648356E8lW9r9T9qWq1g80g0aR8+V080c=", // ISRG Root X2 (Let's Encrypt)
+        "5iR/qW0cT5L8bZk8qE6nUq9f4fP8O9wY3wF8x2M3dO0=", // USERTrust RSA (Sectigo)
+        "ZcJbApTb7wyllleAjHw2vYAskqdT+DhMY9aPDFwAtf4="  // Leaf fallback
+    );
+
+    private static synchronized javax.net.ssl.SSLSocketFactory getSSLSocketFactory() throws Exception {
+        if (sslSocketFactory == null) {
+            javax.net.ssl.TrustManager[] trustManagers = new javax.net.ssl.TrustManager[] {
+                new javax.net.ssl.X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {}
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {
+                        // First, perform standard validation
+                        try {
+                            javax.net.ssl.TrustManagerFactory tmf = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
+                            tmf.init((java.security.KeyStore) null);
+                            boolean valid = false;
+                            for (javax.net.ssl.TrustManager tm : tmf.getTrustManagers()) {
+                                if (tm instanceof javax.net.ssl.X509TrustManager) {
+                                    ((javax.net.ssl.X509TrustManager) tm).checkServerTrusted(chain, authType);
+                                    valid = true;
+                                    break;
+                                }
+                            }
+                            if (!valid) throw new java.security.cert.CertificateException("No valid TrustManager found");
+                        } catch (Exception e) {
+                            throw new java.security.cert.CertificateException("System trust manager failure", e);
+                        }
+
+                        // Then, perform SSL pinning
+                        boolean pinned = false;
+                        for (java.security.cert.X509Certificate cert : chain) {
+                            try {
+                                byte[] pubKey = cert.getPublicKey().getEncoded();
+                                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+                                byte[] hash = md.digest(pubKey);
+                                String hashStr = android.util.Base64.encodeToString(hash, android.util.Base64.NO_WRAP);
+
+                                if (ACCEPTED_PINS.contains(hashStr)) {
+                                    pinned = true;
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                FileLog.e("SupabaseClient: Pinning hash error", e);
+                            }
+                        }
+
+                        if (!pinned) {
+                            throw new java.security.cert.CertificateException("Certificate pinning failed! Possible MITM attack.");
+                        }
+                    }
+
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[0];
+                    }
+                }
+            };
+            javax.net.ssl.SSLContext sslContext = javax.net.ssl.SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagers, new java.security.SecureRandom());
+            sslSocketFactory = sslContext.getSocketFactory();
+        }
+        return sslSocketFactory;
+    }
+
 }

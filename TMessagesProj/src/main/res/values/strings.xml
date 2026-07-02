@@ -22,7 +22,7 @@
     <string name="formatterDay12HSec">h:mm:ss a</string>
     <string name="CopyWithoutProtocol">Copy without protocol</string>
     <!--fork settings view-->
-    <string name="ForkSettingsTitle">Forkgram Classic Settings</string>
+    <string name="ForkSettingsTitle">Telegram Settings</string>
     <string name="ForkCheckUpdate">Check updates</string>
     <string name="InAppCamera">Enable In-App Camera</string>
     <string name="InAppCameraInfo">In Attachments</string>
@@ -11063,4 +11063,7 @@
     <string name="WearAuthText">Connect your account to WatchOS device\nto use it separately from your watch.</string>
     <string name="WearAuthEmojis">Compare emojis on your watch</string>
     <string name="WearAuthEmojisLogIn">Log In</string>
+    <string name="ForkBypassDebugInfo">Debug Information</string>
+    <string name="ForkBackgroundServiceTitle">Telegram Background Service</string>
+    <string name="ForkBackgroundServiceActive">Telegram: background service is active</string>
 </resources>

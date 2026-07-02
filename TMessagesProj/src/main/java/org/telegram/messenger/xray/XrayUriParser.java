@@ -13,6 +13,40 @@ public class XrayUriParser {
             return null;
         }
         uriStr = uriStr.trim();
+        
+        if (uriStr.startsWith("{") && uriStr.endsWith("}")) {
+            XrayNode node = new XrayNode();
+            node.protocol = "json";
+            node.rawJson = uriStr;
+            node.address = "Custom JSON Config";
+            node.remark = "Custom JSON";
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(uriStr);
+                if (obj.has("remarks")) {
+                    node.remark = obj.getString("remarks");
+                }
+                // Try to extract address for deduplication
+                if (obj.has("outbounds")) {
+                    org.json.JSONArray outbounds = obj.getJSONArray("outbounds");
+                    if (outbounds.length() > 0) {
+                        org.json.JSONObject settings = outbounds.getJSONObject(0).optJSONObject("settings");
+                        if (settings != null && settings.has("servers")) {
+                            org.json.JSONArray servers = settings.getJSONArray("servers");
+                            if (servers.length() > 0) {
+                                node.address = servers.getJSONObject(0).optString("address", node.address);
+                            }
+                        } else if (settings != null && settings.has("vnext")) {
+                            org.json.JSONArray vnext = settings.getJSONArray("vnext");
+                            if (vnext.length() > 0) {
+                                node.address = vnext.getJSONObject(0).optString("address", node.address);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {}
+            return node;
+        }
+
         Uri uri = Uri.parse(uriStr);
         String scheme = uri.getScheme();
         if ("vless".equals(scheme)) {

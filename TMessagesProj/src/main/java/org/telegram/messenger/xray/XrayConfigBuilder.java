@@ -9,6 +9,22 @@ public class XrayConfigBuilder {
         if (node == null) {
             return "";
         }
+        
+        if ("json".equals(node.protocol) && node.rawJson != null) {
+            try {
+                JsonObject obj = com.google.gson.JsonParser.parseString(node.rawJson).getAsJsonObject();
+                if (obj.has("inbounds")) {
+                    JsonArray inbounds = obj.getAsJsonArray("inbounds");
+                    if (inbounds.size() > 0) {
+                        inbounds.get(0).getAsJsonObject().addProperty("port", localPort);
+                    }
+                }
+                return new GsonBuilder().setPrettyPrinting().create().toJson(obj);
+            } catch (Exception e) {
+                return node.rawJson;
+            }
+        }
+        
         JsonObject config = new JsonObject();
 
         // Inbounds
