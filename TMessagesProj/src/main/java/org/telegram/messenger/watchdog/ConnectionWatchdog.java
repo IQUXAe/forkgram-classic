@@ -65,7 +65,7 @@ public class ConnectionWatchdog implements NotificationCenter.NotificationCenter
                     // Refreshed in background
                 });
             }
-            handler.postDelayed(this, 3600000); // 1 hour
+            handler.postDelayed(this, 300000); // 5 minutes
         }
     };
 

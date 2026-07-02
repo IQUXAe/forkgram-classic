@@ -138,6 +138,22 @@ public class SupabaseAuthManager {
         }
     }
 
+    public void logout() {
+        setLocallyAuthorized(false);
+        setSavedInviteCode("");
+        SupabaseConfigDistributor.getInstance().clearConfigs();
+
+        org.telegram.messenger.AndroidUtilities.runOnUIThread(() -> {
+            android.content.Context context = org.telegram.messenger.ApplicationLoader.applicationContext;
+            if (context != null) {
+                android.content.Intent intent = new android.content.Intent(context, org.telegram.ui.LaunchActivity.class);
+                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        });
+    }
+
     public String getSavedInviteCode() {
         if (securePrefs != null) {
             return securePrefs.getString("saved_invite_code", "");

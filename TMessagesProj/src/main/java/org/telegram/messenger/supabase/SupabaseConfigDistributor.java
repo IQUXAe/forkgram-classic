@@ -78,6 +78,11 @@ public class SupabaseConfigDistributor {
         SupabaseClient.post("/rest/v1/rpc/get_xray_configs", jsonBody, (result, responseCode, error) -> {
             if (error != null) {
                 FileLog.e("SupabaseConfigDistributor: Failed to fetch xray configs from Supabase", error);
+                if (error.getMessage() != null && error.getMessage().contains("Access denied")) {
+                    FileLog.e("SupabaseConfigDistributor: Authorization revoked by server. Logging out.");
+                    SupabaseAuthManager.getInstance().logout();
+                    return;
+                }
                 callback.onResult(getCachedConfigs());
                 return;
             }
@@ -202,6 +207,17 @@ public class SupabaseConfigDistributor {
             FileLog.d("SupabaseConfigDistributor: Successfully cached " + configs.size() + " configs");
         } catch (Exception e) {
             FileLog.e("SupabaseConfigDistributor: Failed to cache configs", e);
+        }
+    }
+
+    public void clearConfigs() {
+        if (securePrefs != null) {
+            try {
+                securePrefs.edit().remove("xray_nodes_json").apply();
+                FileLog.d("SupabaseConfigDistributor: Cleared cached configs");
+            } catch (Exception e) {
+                FileLog.e("SupabaseConfigDistributor: Failed to clear cached configs", e);
+            }
         }
     }
 
