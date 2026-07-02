@@ -60,8 +60,8 @@ public class SupabaseConfigDistributor {
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
         } catch (Throwable e) {
-            FileLog.e("SupabaseConfigDistributor: Failed to initialize EncryptedSharedPreferences, falling back to plain", e);
-            securePrefs = context.getSharedPreferences("plain_secure_config_distributor_prefs_supabase", Context.MODE_PRIVATE);
+            FileLog.e("SupabaseConfigDistributor: Failed to initialize EncryptedSharedPreferences. Tink failure.", e);
+            throw new IllegalStateException("Security error: Cannot initialize EncryptedSharedPreferences. Fallback to unencrypted storage is disabled.", e);
         }
     }
 
