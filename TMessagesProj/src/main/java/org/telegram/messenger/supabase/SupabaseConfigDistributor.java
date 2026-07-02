@@ -292,8 +292,8 @@ public class SupabaseConfigDistributor {
                 String currentSignature = android.util.Base64.encodeToString(md.digest(), android.util.Base64.NO_WRAP);
 
                 // DEBUG Keystore signature base64 hash: "nik88HLK1/gJ9na26cx1n+rwWi6d8O2ee89SAXAJY44="
-                // RELEASE Keystore signature base64 hash: "kYcX5xr3pI8eUeMEx56UWU0p35h1hcUMeBY3DFB99Hw="
-                if ("kYcX5xr3pI8eUeMEx56UWU0p35h1hcUMeBY3DFB99Hw=".equals(currentSignature)) {
+                // RELEASE Keystore signature base64 hash (CN=IQUXAe): "sEAb/ig1zJ2XHCkn2oFcrp/wWNKss7sSR7fo+BG+BeU="
+                if ("sEAb/ig1zJ2XHCkn2oFcrp/wWNKss7sSR7fo+BG+BeU=".equals(currentSignature)) {
                     return true;
                 }
                 if (org.telegram.messenger.BuildConfig.DEBUG && "nik88HLK1/gJ9na26cx1n+rwWi6d8O2ee89SAXAJY44=".equals(currentSignature)) {
