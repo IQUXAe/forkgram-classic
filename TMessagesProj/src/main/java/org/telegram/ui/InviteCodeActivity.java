@@ -61,7 +61,7 @@ public class InviteCodeActivity extends BaseFragment {
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setGravity(Gravity.CENTER);
-        container.setPadding(AndroidUtilities.dp(36), 0, AndroidUtilities.dp(36), 0);
+        container.setPadding(AndroidUtilities.dp(36), AndroidUtilities.dp(72), AndroidUtilities.dp(36), AndroidUtilities.dp(32));
 
         titleTextView = new TextView(context);
         titleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
@@ -121,7 +121,9 @@ public class InviteCodeActivity extends BaseFragment {
         progressView.setVisibility(View.INVISIBLE);
         container.addView(progressView, LayoutHelper.createLinear(-2, -2, Gravity.CENTER, 0, 0, 0, 0));
 
-        scrollView.addView(container, new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+        android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.CENTER_VERTICAL;
+        scrollView.addView(container, lp);
         return scrollView;
     }
 
@@ -160,9 +162,13 @@ public class InviteCodeActivity extends BaseFragment {
                                 }
                             }
                             
-                            // Exit this activity and go to standard Intro/Login flow
+                            // Exit this activity and go to appropriate flow
                             if (parentLayout != null) {
-                                parentLayout.presentFragment(new IntroActivity(), true, false, true, false);
+                                if (org.telegram.messenger.UserConfig.getInstance(org.telegram.messenger.UserConfig.selectedAccount).isClientActivated()) {
+                                    parentLayout.presentFragment(new DialogsActivity(null), true, false, true, false);
+                                } else {
+                                    parentLayout.presentFragment(new IntroActivity(), true, false, true, false);
+                                }
                             }
                         });
                     });

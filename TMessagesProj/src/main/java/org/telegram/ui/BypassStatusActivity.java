@@ -126,9 +126,7 @@ public class BypassStatusActivity extends BaseFragment implements NotificationCe
         linearLayout.addView(logoutButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 16, 0, 16, 16));
 
         logoutButton.setOnClickListener(v -> {
-            SupabaseAuthManager.getInstance().setLocallyAuthorized(false);
-            Toast.makeText(context, "Авторизация сброшена", Toast.LENGTH_SHORT).show();
-            updateValues();
+            SupabaseAuthManager.getInstance().logout();
         });
 
         updateValues();

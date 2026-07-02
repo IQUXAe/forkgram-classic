@@ -203,7 +203,7 @@ public class SupabaseConfigDistributor {
         }
         try {
             String json = gson.toJson(configs);
-            securePrefs.edit().putString("xray_nodes_json", json).apply();
+            securePrefs.edit().putString("xray_nodes_json", json).commit();
             FileLog.d("SupabaseConfigDistributor: Successfully cached " + configs.size() + " configs");
         } catch (Exception e) {
             FileLog.e("SupabaseConfigDistributor: Failed to cache configs", e);
@@ -213,7 +213,7 @@ public class SupabaseConfigDistributor {
     public void clearConfigs() {
         if (securePrefs != null) {
             try {
-                securePrefs.edit().remove("xray_nodes_json").apply();
+                securePrefs.edit().remove("xray_nodes_json").commit();
                 FileLog.d("SupabaseConfigDistributor: Cleared cached configs");
             } catch (Exception e) {
                 FileLog.e("SupabaseConfigDistributor: Failed to clear cached configs", e);

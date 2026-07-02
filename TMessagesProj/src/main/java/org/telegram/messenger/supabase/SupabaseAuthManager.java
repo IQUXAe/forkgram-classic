@@ -128,13 +128,13 @@ public class SupabaseAuthManager {
 
     public void setLocallyAuthorized(boolean authorized) {
         if (securePrefs != null) {
-            securePrefs.edit().putBoolean("is_authorized", authorized).apply();
+            securePrefs.edit().putBoolean("is_authorized", authorized).commit();
         }
     }
 
     public void setSavedInviteCode(String code) {
         if (securePrefs != null) {
-            securePrefs.edit().putString("saved_invite_code", code).apply();
+            securePrefs.edit().putString("saved_invite_code", code).commit();
         }
     }
 
