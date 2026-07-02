@@ -176,7 +176,7 @@ public class ApplicationLoader extends Application {
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
 
         // Start Xray if device is authorized (after native libs are loaded)
-        if (org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+        if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN && org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
             org.telegram.messenger.xray.XrayNode cachedNode = org.telegram.messenger.supabase.SupabaseConfigDistributor.getInstance().getFirstNode();
             if (cachedNode != null) {
                 org.telegram.messenger.xray.XrayManager.getInstance().start(cachedNode);

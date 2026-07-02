@@ -699,7 +699,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             items.add(UItem.asShadow(null));
             items.add(UItem.asHeader("Telegram"));
             items.add(SettingCell.Factory.of(98, IconBackgroundColors.PURPLE.top, IconBackgroundColors.PURPLE.bottom, R.drawable.settings_fork, getString(R.string.ForkSettingsTitle)));
-            items.add(SettingCell.Factory.of(100, IconBackgroundColors.GRAY.top, IconBackgroundColors.GRAY.bottom, R.drawable.msg_log, LocaleController.getString("ForkBypassDebugInfo", R.string.ForkBypassDebugInfo)));
+            if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN) {
+                items.add(SettingCell.Factory.of(100, IconBackgroundColors.GRAY.top, IconBackgroundColors.GRAY.bottom, R.drawable.msg_log, LocaleController.getString("ForkBypassDebugInfo", R.string.ForkBypassDebugInfo)));
+            }
         }
 
         items.add(UItem.asShadow(null));
@@ -864,7 +866,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 ((LaunchActivity) getParentActivity()).checkAppUpdate(true, null);
                 break;
             case 100:
-                presentFragment(new org.telegram.ui.BypassStatusActivity());
+                if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN) {
+                    presentFragment(new org.telegram.ui.BypassStatusActivity());
+                }
                 break;
 
             case 17:

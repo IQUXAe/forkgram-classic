@@ -3319,8 +3319,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             downloadsItem.setVisibility(View.GONE);
 
             // Add XrayStatusView to ActionBar
-            xrayStatusView = new org.telegram.ui.Components.XrayStatusView(context);
-            actionBar.addView(xrayStatusView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 48, 0));
+            if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN) {
+                xrayStatusView = new org.telegram.ui.Components.XrayStatusView(context);
+                actionBar.addView(xrayStatusView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 48, 0));
+            }
 
             updateProxyButton(false, false);
         }

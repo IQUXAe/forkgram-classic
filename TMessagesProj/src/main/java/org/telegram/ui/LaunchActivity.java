@@ -1770,7 +1770,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @SuppressLint("Range")
     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword, Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
-        if (!org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+        if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN && !org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
             if (actionBarLayout != null) {
                 actionBarLayout.removeAllFragments();
                 actionBarLayout.addFragmentToStack(getClientNotActivatedFragment(), INavigationLayout.FORCE_NOT_ATTACH_VIEW);
@@ -3579,7 +3579,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         if (!pushOpened && !isNew) {
             if (AndroidUtilities.isTablet()) {
-                if (!org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized() || !UserConfig.getInstance(currentAccount).isClientActivated()) {
+                if ((org.telegram.messenger.BuildVars.EDITION_WITH_VPN && !org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) || !UserConfig.getInstance(currentAccount).isClientActivated()) {
                     if (layersActionBarLayout.getFragmentStack().isEmpty()) {
                         layersActionBarLayout.addFragmentToStack(getClientNotActivatedFragment(), INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                     }
@@ -3595,7 +3595,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             } else {
                 if (actionBarLayout.getFragmentStack().isEmpty()) {
-                    if (!org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized() || !UserConfig.getInstance(currentAccount).isClientActivated()) {
+                    if ((org.telegram.messenger.BuildVars.EDITION_WITH_VPN && !org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) || !UserConfig.getInstance(currentAccount).isClientActivated()) {
                         actionBarLayout.addFragmentToStack(getClientNotActivatedFragment(), INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                     } else {
                         MainTabsActivity mainTabsActivity = new MainTabsActivity();

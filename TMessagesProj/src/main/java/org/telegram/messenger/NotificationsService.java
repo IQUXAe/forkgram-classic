@@ -72,7 +72,7 @@ public class NotificationsService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // postInitApplication() защищена флагом applicationInited и не запустит Xray/Watchdog повторно.
         // Поэтому явно перезапускаем их здесь — на случай если сервис был убит Android и поднялся снова.
-        if (org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
+        if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN && org.telegram.messenger.supabase.SupabaseAuthManager.getInstance().isLocallyAuthorized()) {
             org.telegram.messenger.xray.XrayManager xrayManager = org.telegram.messenger.xray.XrayManager.getInstance();
             if (!xrayManager.isRunning()) {
                 org.telegram.messenger.xray.XrayNode cachedNode = org.telegram.messenger.supabase.SupabaseConfigDistributor.getInstance().getFirstNode();
@@ -97,8 +97,10 @@ public class NotificationsService extends Service {
     }
 
     public void onDestroy() {
-        org.telegram.messenger.xray.XrayManager.getInstance().stop();
-        org.telegram.messenger.watchdog.ConnectionWatchdog.getInstance().stop();
+        if (org.telegram.messenger.BuildVars.EDITION_WITH_VPN) {
+            org.telegram.messenger.xray.XrayManager.getInstance().stop();
+            org.telegram.messenger.watchdog.ConnectionWatchdog.getInstance().stop();
+        }
         super.onDestroy();
         SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
         if (preferences.getBoolean("pushService", true)) {

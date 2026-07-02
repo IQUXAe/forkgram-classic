@@ -42,6 +42,9 @@ public class BuildVars {
 
     // You can use this flag to disable Google Play Billing (If you're making fork and want it to be in Google Play)
     public static boolean IS_BILLING_UNAVAILABLE = false;
+    
+    // Toggle for Supabase/Xray VPN features
+    public static boolean EDITION_WITH_VPN = true;
 
     // works only on official app ids, disable on your forks
     public static boolean SUPPORTS_PASSKEYS = true;
