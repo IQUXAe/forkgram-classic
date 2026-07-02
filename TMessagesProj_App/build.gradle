@@ -50,7 +50,7 @@ android {
     compileSdkVersion 35
     buildToolsVersion '35.0.0'
 
-    defaultConfig.applicationId = "org.iquxae.forkgram.ru"
+    defaultConfig.applicationId = "org.iquxae.forkgram"
 
     sourceSets.main.jniLibs.srcDirs = ['../TMessagesProj/jni/']
 
@@ -71,7 +71,7 @@ android {
     def appSuffix = ""
     def flavorsConfig = fdroid ? "release" : "debug"
     if (fdroid) {
-        defaultConfig.applicationId = "org.iquxae.forkgram.ru"
+        defaultConfig.applicationId = "org.iquxae.forkgram"
     }
 
     signingConfigs {

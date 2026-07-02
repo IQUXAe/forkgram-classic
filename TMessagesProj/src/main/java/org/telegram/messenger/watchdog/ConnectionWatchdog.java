@@ -35,7 +35,7 @@ public class ConnectionWatchdog implements NotificationCenter.NotificationCenter
     private static final int BACKGROUND_POLL_INTERVAL_MS = 10_000;
 
     // AlarmManager action для пробуждения из Doze
-    private static final String ACTION_WATCHDOG_ALARM = "org.iquxae.forkgram.ru.WATCHDOG_ALARM";
+    private static final String ACTION_WATCHDOG_ALARM = "org.iquxae.forkgram.WATCHDOG_ALARM";
     private static final int ALARM_INTERVAL_MS = 15_000;
 
     // Используем HandlerThread — отдельный поток с собственным Looper.

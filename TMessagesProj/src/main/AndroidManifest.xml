@@ -615,7 +615,7 @@
             android:name="org.telegram.messenger.watchdog.WatchdogAlarmReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="org.iquxae.forkgram.ru.WATCHDOG_ALARM"/>
+                <action android:name="org.iquxae.forkgram.WATCHDOG_ALARM"/>
             </intent-filter>
         </receiver>
 
