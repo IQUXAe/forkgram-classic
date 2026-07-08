@@ -17671,7 +17671,19 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         views.add(cell);
                     }
                     cell.setCaching(top, true);
+                    // [classic] #74: this pinned 12.1.1 blur snapshot draws each message
+                    // cell with a raw RecordingCanvas (upstream uses a SimplerCanvas that
+                    // NOPs text rendering). A normal text draw runs drawMessageText, which
+                    // clears the shared AnimatedEmojiSpan positions (spanDrawn=false) unless
+                    // this is flagged as a blur draw (ChatMessageCell ~14355). Because the
+                    // cell's cached display list may not re-run drawMessageText on the main
+                    // pass, spanDrawn stays false and inline custom emoji vanish from the
+                    // list until the chat is reopened. Mark the snapshot as a blur draw so
+                    // the emoji positions are preserved.
+                    boolean prevDrawForBlur = cell.drawForBlur;
+                    cell.drawForBlur = true;
                     cell.drawCached(blurCanvas);
+                    cell.drawForBlur = prevDrawForBlur;
 //                    if (cell.hasOutboundsContent()) {
 //                        if (drawAsChild) {
 //                            blurCanvas.save();
